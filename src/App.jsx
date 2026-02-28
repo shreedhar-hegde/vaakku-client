@@ -12,8 +12,7 @@ import Settings from './pages/Settings';
 import Learn from './pages/Learn';
 import History from './pages/History';
 import AdminDashboard from './pages/AdminDashboard';
-
-const ANONYMOUS_PATHS = ['/tts', '/stt', '/translate', '/learn', '/dashboard'];
+import { ROUTES, ANONYMOUS_PATHS } from './constants/routes';
 
 function RootRoute() {
   const token = localStorage.getItem('token');
@@ -21,7 +20,7 @@ function RootRoute() {
   const path = location.pathname;
 
   if (!token) {
-    if (path === '/') return <Landing />;
+    if (path === ROUTES.DASHBOARD_INDEX) return <Landing />;
     if (ANONYMOUS_PATHS.includes(path)) {
       return (
         <Layout>
@@ -29,7 +28,7 @@ function RootRoute() {
         </Layout>
       );
     }
-    return <Navigate to="/" replace />;
+    return <Navigate to={ROUTES.LANDING} replace />;
   }
 
   return (
@@ -61,10 +60,10 @@ function Layout({ children }) {
 export default function App() {
   return (
     <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<Signup />} />
-      <Route path="/landing" element={<Landing />} />
-      <Route path="/" element={<RootRoute />}>
+      <Route path={ROUTES.LOGIN} element={<Login />} />
+      <Route path={ROUTES.SIGNUP} element={<Signup />} />
+      <Route path={ROUTES.LANDING} element={<Landing />} />
+      <Route path={ROUTES.DASHBOARD_INDEX} element={<RootRoute />}>
         <Route index element={<Dashboard />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="tts" element={<TTS />} />
@@ -75,7 +74,7 @@ export default function App() {
         <Route path="history" element={<History />} />
         <Route path="admin" element={<AdminDashboard />} />
       </Route>
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<Navigate to={ROUTES.LANDING} replace />} />
     </Routes>
   );
 }
