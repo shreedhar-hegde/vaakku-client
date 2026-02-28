@@ -149,16 +149,6 @@ export default function TTS() {
         >
           {/* Left panel: input */}
           <div className="flex flex-1 flex-col md:min-w-0">
-            <div className="flex items-center justify-end border-b px-3 py-2" style={{ borderColor: 'var(--color-border)' }}>
-              <Link
-                to={ROUTES.LEARN}
-                className="flex items-center gap-1 text-sm transition-opacity hover:opacity-80"
-                style={{ color: 'var(--color-text-muted)' }}
-              >
-                How it works
-                <span aria-hidden>↗</span>
-              </Link>
-            </div>
             <form onSubmit={handleSubmit} className="flex flex-1 flex-col p-3">
               <textarea
                 value={text}

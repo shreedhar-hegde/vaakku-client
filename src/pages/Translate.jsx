@@ -12,7 +12,39 @@ import {
 } from '../utils/anonymousUsage';
 import { ROUTES } from '../constants/routes';
 import { LANGUAGES_WITH_AUTO, LANGUAGES_TARGET } from '../constants/languages';
-import { LanguageSelect } from '../components/LanguageSelect';
+
+function LangTabRow({ value, onChange, options, 'aria-label': ariaLabel }) {
+  return (
+    <div
+      role="tablist"
+      className="flex overflow-x-auto border-b py-1"
+      style={{ borderColor: 'var(--color-border)' }}
+      aria-label={ariaLabel}
+    >
+      {options.map((opt) => {
+        const isSelected = value === opt.value;
+        return (
+          <button
+            key={opt.value}
+            type="button"
+            role="tab"
+            aria-selected={isSelected}
+            onClick={() => onChange(opt.value)}
+            className="translate-lang-tab shrink-0 border-b-2 px-3 py-2 text-sm transition-colors duration-150"
+            style={{
+              borderBottomColor: isSelected ? 'var(--color-accent)' : 'transparent',
+              color: isSelected ? 'var(--color-accent)' : 'var(--color-text-muted)',
+              backgroundColor: 'transparent',
+            }}
+          >
+            {opt.label}
+            {opt.native ? ` ${opt.native}` : ''}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
 
 export default function Translate() {
   const { user, refreshUser } = useUser();
@@ -23,6 +55,14 @@ export default function Translate() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [translated, setTranslated] = useState('');
+
+  const [swapRotated, setSwapRotated] = useState(false);
+  const swapLangs = () => {
+    if (sourceLang === 'auto') return;
+    setSwapRotated((r) => !r);
+    setSourceLang(targetLang);
+    setTargetLang(sourceLang);
+  };
 
   const isAnonymous = !user;
   const maxChars = isAnonymous ? ANON_MAX_CHARS.translate : 1000;
@@ -98,19 +138,16 @@ export default function Translate() {
         </div>
       )}
 
-      <div className="flex min-h-[420px] flex-col rounded-lg md:flex-row" style={{ backgroundColor: 'var(--color-surface)' }}>
+      <div className="flex min-h-[420px] flex-col border md:flex-row" style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-surface)' }}>
         {/* Left panel: input */}
-        <div className="flex flex-1 flex-col md:min-w-0 md:rounded-l-lg">
-          <div className="px-3 py-2">
-            <LanguageSelect
-              value={sourceLang}
-              onValueChange={setSourceLang}
-              options={LANGUAGES_WITH_AUTO}
-              placeholder="Source language"
-              aria-label="Source language"
-            />
-          </div>
-          <form onSubmit={handleSubmit} className="flex flex-1 flex-col p-3 pt-0">
+        <div className="flex flex-1 flex-col md:min-w-0">
+          <LangTabRow
+            value={sourceLang}
+            onChange={setSourceLang}
+            options={LANGUAGES_WITH_AUTO}
+            aria-label="Source language"
+          />
+          <form onSubmit={handleSubmit} className="flex flex-1 flex-col p-3">
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -142,20 +179,32 @@ export default function Translate() {
           </form>
         </div>
 
-        {/* Subtle divider (no swap button) */}
-        <div className="hidden shrink-0 md:block md:w-px" style={{ backgroundColor: 'var(--color-border)' }} aria-hidden />
+        {/* Swap button */}
+        <div
+          className="flex shrink-0 items-center justify-center border-b py-2 md:w-12 md:flex-col md:border-b-0 md:border-l"
+          style={{ borderColor: 'var(--color-border)' }}
+        >
+          <button
+            type="button"
+            onClick={swapLangs}
+            disabled={sourceLang === 'auto'}
+            className={`swap-rotate flex h-9 w-9 items-center justify-center rounded border transition-[transform,border-color,opacity] duration-150 hover:border-[var(--color-accent)] disabled:opacity-40 ${swapRotated ? 'translate-x-0 rotate-180' : ''}`}
+            style={{ borderColor: 'var(--color-border)' }}
+            aria-label="Swap languages"
+            title="Swap languages"
+          >
+            <span className="text-lg" aria-hidden>⇄</span>
+          </button>
+        </div>
 
         {/* Right panel: output */}
-        <div className="flex min-h-[200px] flex-1 flex-col border-t md:min-w-0 md:border-t-0 md:rounded-r-lg" style={{ borderColor: 'var(--color-border)' }}>
-          <div className="px-3 py-2" style={{ borderColor: 'var(--color-border)' }}>
-            <LanguageSelect
-              value={targetLang}
-              onValueChange={setTargetLang}
-              options={LANGUAGES_TARGET}
-              placeholder="Target language"
-              aria-label="Target language"
-            />
-          </div>
+        <div className="flex min-h-[200px] flex-1 flex-col border-t md:min-w-0 md:border-t-0" style={{ borderColor: 'var(--color-border)' }}>
+          <LangTabRow
+            value={targetLang}
+            onChange={setTargetLang}
+            options={LANGUAGES_TARGET}
+            aria-label="Target language"
+          />
           <div className="content-indic relative flex-1 whitespace-pre-wrap p-3" style={{ minHeight: 160 }}>
             {hasOutput ? (
               translated
@@ -174,13 +223,6 @@ export default function Translate() {
                 <p className="mt-1 max-w-xs text-center text-sm" style={{ color: 'var(--color-text-muted)' }}>
                   Enter text and click Translate. Result appears here.
                 </p>
-                <Link
-                  to={ROUTES.LEARN}
-                  className="mt-3 rounded border py-2 px-4 text-sm font-medium transition-colors duration-150"
-                  style={{ borderColor: 'var(--color-border)', color: 'var(--color-text)' }}
-                >
-                  How it works
-                </Link>
               </div>
             )}
           </div>

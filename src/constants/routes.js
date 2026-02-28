@@ -3,8 +3,6 @@ export const ROUTES = {
   LANDING: '/landing',
   LOGIN: '/login',
   SIGNUP: '/signup',
-  DASHBOARD: '/dashboard',
-  DASHBOARD_INDEX: '/',
   TTS: '/tts',
   STT: '/stt',
   TRANSLATE: '/translate',
@@ -14,5 +12,5 @@ export const ROUTES = {
   ADMIN: '/admin',
 };
 
-/** Paths allowed without authentication (anonymous tier). Root (/) excluded so non-logged-in users see landing first. */
-export const ANONYMOUS_PATHS = [ROUTES.TTS, ROUTES.STT, ROUTES.TRANSLATE, ROUTES.LEARN, ROUTES.DASHBOARD];
+/** Paths allowed without authentication (anonymous tier). No sidebar/dashboard for anonymous. */
+export const ANONYMOUS_PATHS = [ROUTES.TTS, ROUTES.STT, ROUTES.TRANSLATE];

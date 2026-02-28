@@ -50,7 +50,7 @@ function StopIcon() {
 export default function STT() {
   const { user, refreshUser } = useUser();
   const { t } = useLocale();
-  const [tab, setTab] = useState(0);
+  const [tab, setTab] = useState(1);
   const isAnonymous = !user;
   const anonRemaining = getAnonymousRemaining('stt');
   const anonLimitReached = isAnonymous && anonRemaining <= 0;
@@ -236,7 +236,7 @@ export default function STT() {
               backgroundColor: 'transparent',
             }}
           >
-            Record live
+            Record
           </button>
         </div>
 
@@ -292,8 +292,8 @@ export default function STT() {
                 <button
                   type="button"
                   onClick={startRecording}
-                  className="flex h-20 w-20 items-center justify-center rounded-full text-white transition-opacity duration-150 hover:opacity-90"
-                  style={{ backgroundColor: 'var(--color-accent)' }}
+                  className="flex h-24 w-24 items-center justify-center rounded-full text-white transition-opacity duration-150 hover:opacity-90"
+                  style={{ backgroundColor: '#f59e0b' }}
                   aria-label="Start recording"
                 >
                   <MicIcon />
@@ -308,18 +308,17 @@ export default function STT() {
                 <button
                   type="button"
                   onClick={stopRecording}
-                  className="flex h-20 w-20 items-center justify-center rounded-full border-4 text-white"
+                  className="stt-record-active flex h-24 w-24 items-center justify-center rounded-full border-4 text-white"
                   style={{
                     backgroundColor: '#dc2626',
                     borderColor: 'rgba(220, 38, 38, 0.5)',
-                    animation: 'record-pulse 1.5s ease-in-out infinite',
                   }}
                   aria-label="Stop recording"
                 >
                   <StopIcon />
                 </button>
-                <p className="text-sm" style={{ color: 'var(--color-text)' }}>
-                  Recording {formatTime(recordDuration)}
+                <p className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>
+                  {formatTime(recordDuration)}
                 </p>
                 <button
                   type="button"
@@ -366,15 +365,15 @@ export default function STT() {
 
         {result && (
           <div
-            className="content-indic mt-6 rounded border p-4"
-            style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-bg)' }}
+            className="content-indic mt-6 rounded-lg border p-4"
+            style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-bg)', lineHeight: 1.9, fontFamily: 'var(--font-body)' }}
           >
             {result.language_code && (
               <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
                 Language: {result.language_code}
               </p>
             )}
-            <p className="mt-2 whitespace-pre-wrap" style={{ lineHeight: 1.9 }}>
+            <p className="mt-2 whitespace-pre-wrap">
               {result.transcript || '—'}
             </p>
           </div>

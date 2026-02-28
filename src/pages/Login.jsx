@@ -13,7 +13,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
 
   if (localStorage.getItem('token')) {
-    return <Navigate to={ROUTES.DASHBOARD_INDEX} replace />;
+    return <Navigate to={ROUTES.TTS} replace />;
   }
 
   const handleSubmit = async (e) => {
@@ -24,7 +24,7 @@ export default function Login() {
       const { data } = await auth.login(email, password);
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
-      navigate('/');
+      navigate(ROUTES.TTS);
     } catch (err) {
       setError(err.response?.data?.error || 'Login failed');
     } finally {

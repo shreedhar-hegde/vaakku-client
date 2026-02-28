@@ -6,7 +6,6 @@ import MobileNav from './components/MobileNav';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Landing from './pages/Landing';
-import Dashboard from './pages/Dashboard';
 import TTS from './pages/TTS';
 import STT from './pages/STT';
 import Translate from './pages/Translate';
@@ -16,15 +15,20 @@ import History from './pages/History';
 import AdminDashboard from './pages/AdminDashboard';
 import { ROUTES, ANONYMOUS_PATHS } from './constants/routes';
 
+function RedirectRoot() {
+  const token = localStorage.getItem('token');
+  return <Navigate to={token ? ROUTES.TTS : ROUTES.LANDING} replace />;
+}
+
 function RootRoute() {
   const token = localStorage.getItem('token');
-  const location = useLocation();
-  const path = location.pathname;
+  const { pathname } = useLocation();
 
   if (!token) {
-    if (ANONYMOUS_PATHS.includes(path)) {
+    if (pathname === '/') return <Navigate to={ROUTES.LANDING} replace />;
+    if (ANONYMOUS_PATHS.includes(pathname)) {
       return (
-        <Layout>
+        <Layout showSidebar={false}>
           <Outlet />
         </Layout>
       );
@@ -33,18 +37,18 @@ function RootRoute() {
   }
 
   return (
-    <Layout>
+    <Layout showSidebar={true}>
       <Outlet />
     </Layout>
   );
 }
 
-function Layout({ children }) {
+function Layout({ children, showSidebar }) {
   return (
     <UserProvider>
       <Topbar />
       <div className="flex min-h-screen pt-14" style={{ backgroundColor: 'var(--color-bg)' }}>
-        <Sidebar />
+        {showSidebar && <Sidebar />}
         <main
           className="flex-1 px-5 pb-24 pt-6 md:px-12 md:pb-12"
           style={{
@@ -68,9 +72,8 @@ export default function App() {
       <Route path={ROUTES.LOGIN} element={<Login />} />
       <Route path={ROUTES.SIGNUP} element={<Signup />} />
       <Route path={ROUTES.LANDING} element={<Landing />} />
-      <Route path={ROUTES.DASHBOARD_INDEX} element={<RootRoute />}>
-        <Route index element={<Dashboard />} />
-        <Route path="dashboard" element={<Dashboard />} />
+      <Route path="/" element={<RootRoute />}>
+        <Route index element={<RedirectRoot />} />
         <Route path="tts" element={<TTS />} />
         <Route path="stt" element={<STT />} />
         <Route path="translate" element={<Translate />} />

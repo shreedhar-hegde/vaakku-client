@@ -14,11 +14,6 @@ const ACCOUNT_LINKS = [
   { key: 'settings', path: ROUTES.SETTINGS },
 ];
 
-const OTHER_LINKS = [
-  { key: 'dashboard', path: ROUTES.DASHBOARD_INDEX },
-  { key: 'learn', path: ROUTES.LEARN },
-];
-
 function NavLink({ path, keyName, label, isActive }) {
   return (
     <Link
@@ -43,8 +38,7 @@ export default function Sidebar() {
   const showAdmin = user?.isAdmin;
 
   const isActive = (path) =>
-    location.pathname === path ||
-    (path !== ROUTES.DASHBOARD_INDEX && location.pathname.startsWith(path));
+    location.pathname === path || location.pathname.startsWith(path + '/');
 
   return (
     <aside
@@ -60,10 +54,6 @@ export default function Sidebar() {
         ))}
         <div className="my-1.5 h-px shrink-0" style={{ backgroundColor: 'var(--color-border)' }} aria-hidden />
         {ACCOUNT_LINKS.map(({ key, path }) => (
-          <NavLink key={path} path={path} keyName={key} label={t(`nav.${key}`)} isActive={isActive(path)} />
-        ))}
-        <div className="my-1.5 h-px shrink-0" style={{ backgroundColor: 'var(--color-border)' }} aria-hidden />
-        {OTHER_LINKS.map(({ key, path }) => (
           <NavLink key={path} path={path} keyName={key} label={t(`nav.${key}`)} isActive={isActive(path)} />
         ))}
         {showAdmin && (

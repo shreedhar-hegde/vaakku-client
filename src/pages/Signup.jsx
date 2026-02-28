@@ -15,7 +15,7 @@ export default function Signup() {
   const [loading, setLoading] = useState(false);
 
   if (localStorage.getItem('token')) {
-    return <Navigate to={ROUTES.DASHBOARD_INDEX} replace />;
+    return <Navigate to={ROUTES.TTS} replace />;
   }
 
   const requirements = getPasswordRequirements(password);
@@ -39,7 +39,7 @@ export default function Signup() {
       const { data } = await auth.signup(email, password);
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
-      navigate('/');
+      navigate(ROUTES.TTS);
     } catch (err) {
       setError(err.response?.data?.error || 'Signup failed');
     } finally {

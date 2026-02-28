@@ -21,17 +21,6 @@ export default function MobileNav() {
       }}
     >
       <div className="flex w-full">
-        <Link
-          to={ROUTES.DASHBOARD_INDEX}
-          className="flex flex-1 flex-col items-center gap-0.5 py-2 text-xs transition-opacity duration-150"
-          style={{
-            color: location.pathname === ROUTES.DASHBOARD_INDEX ? 'var(--color-accent)' : 'var(--color-text-muted)',
-            textDecoration: 'none',
-            fontWeight: location.pathname === ROUTES.DASHBOARD_INDEX ? 600 : 400,
-          }}
-        >
-          {t('nav.dashboard')}
-        </Link>
         {TABS.map(({ key, path }) => {
           const isActive = location.pathname === path || location.pathname.startsWith(path + '/');
           return (

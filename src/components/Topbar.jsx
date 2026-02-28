@@ -107,7 +107,7 @@ export default function Topbar() {
               style={{ animation: 'fadeIn 150ms ease' }}
             />
             <Dialog.Content
-              className="fixed left-1/2 top-1/2 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-lg border p-4 shadow-lg"
+              className="fixed left-1/2 top-1/2 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-lg border p-4"
               style={{
                 backgroundColor: 'var(--color-surface)',
                 borderColor: 'var(--color-border)',
@@ -199,14 +199,25 @@ export default function Topbar() {
         <div className="h-4 w-px shrink-0" style={{ backgroundColor: 'var(--color-border)' }} aria-hidden />
 
         {user ? (
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="hidden rounded px-3 py-1.5 text-sm transition-opacity duration-150 hover:opacity-90 sm:block"
-            style={{ color: 'var(--color-text-muted)' }}
-          >
-            {t('nav.logout')}
-          </button>
+          <>
+            <Link
+              to={ROUTES.LEARN}
+              className="hidden rounded p-1.5 text-sm transition-opacity duration-150 hover:opacity-90 sm:block"
+              style={{ color: 'var(--color-text-muted)' }}
+              aria-label="How it works"
+              title="How it works"
+            >
+              How it works
+            </Link>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="hidden rounded px-3 py-1.5 text-sm transition-opacity duration-150 hover:opacity-90 sm:block"
+              style={{ color: 'var(--color-text-muted)' }}
+            >
+              {t('nav.logout')}
+            </button>
+          </>
         ) : (
           <div className="hidden items-center gap-2 sm:flex">
             <Link
