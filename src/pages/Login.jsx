@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useNavigate, Navigate } from 'react-router-dom';
 import { Box, Paper, Typography, TextField, Button, Link, Alert } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
 import { auth } from '../api/axios';
 import { useLocale } from '../context/LocaleContext';
+import { ROUTES } from '../constants/routes';
 
 export default function Login() {
   const theme = useTheme();
@@ -14,6 +15,10 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  if (localStorage.getItem('token')) {
+    return <Navigate to={ROUTES.DASHBOARD_INDEX} replace />;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();

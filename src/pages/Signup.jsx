@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useNavigate, Navigate } from 'react-router-dom';
 import {
   Box,
   Paper,
@@ -20,6 +20,7 @@ import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import { auth } from '../api/axios';
 import { useLocale } from '../context/LocaleContext';
 import { getPasswordRequirements, validatePassword } from '../utils/passwordValidation';
+import { ROUTES } from '../constants/routes';
 
 export default function Signup() {
   const theme = useTheme();
@@ -30,6 +31,10 @@ export default function Signup() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  if (localStorage.getItem('token')) {
+    return <Navigate to={ROUTES.DASHBOARD_INDEX} replace />;
+  }
 
   const requirements = getPasswordRequirements(password);
   const passwordValid = requirements.every((r) => r.met);

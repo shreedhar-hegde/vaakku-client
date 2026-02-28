@@ -11,11 +11,15 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Alert,
+  Button,
 } from '@mui/material';
 import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver';
 import MicIcon from '@mui/icons-material/Mic';
 import TranslateIcon from '@mui/icons-material/Translate';
 import { useLocale } from '../context/LocaleContext';
+import { useUser } from '../context/UserContext';
+import { ROUTES } from '../constants/routes';
 
 const toolKeys = [
   { key: 'tts', path: '/tts', icon: <RecordVoiceOverIcon sx={{ fontSize: 40 }} /> },
@@ -25,9 +29,16 @@ const toolKeys = [
 
 export default function Dashboard() {
   const { locale, setLocale, t, options } = useLocale();
+  const { user } = useUser();
+  const isAnonymous = !user;
 
   return (
     <Box sx={{ py: { xs: 2, sm: 3 } }}>
+      {isAnonymous && (
+        <Alert severity="info" sx={{ mb: 2 }} action={<Button component={RouterLink} to={ROUTES.SIGNUP} size="small" color="inherit">{t('nav.signUp')}</Button>}>
+          {t('dashboard.tryModeInfo')}
+        </Alert>
+      )}
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 1, mb: 2 }}>
         <Typography color="text.secondary" sx={{ mb: { xs: 2, sm: 3 } }}>
           {t('dashboard.intro')}{' '}

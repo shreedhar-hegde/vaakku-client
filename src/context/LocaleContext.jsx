@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect, useCallback } from 'rea
 
 const STORAGE_KEY = 'vaakku_locale';
 const LOCALES_BASE = '/locales';
+const LOCALE_CACHE_BUST = '?v=2'; // bump when adding/editing locale keys
 
 export const LOCALE_OPTIONS = [
   { value: 'en', label: 'English' },
@@ -31,7 +32,7 @@ export function LocaleProvider({ children }) {
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    const url = `${LOCALES_BASE}/${locale}.json`;
+    const url = `${LOCALES_BASE}/${locale}.json${LOCALE_CACHE_BUST}`;
     fetch(url)
       .then((r) => {
         if (!r.ok) throw new Error(r.statusText);

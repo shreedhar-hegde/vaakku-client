@@ -6,6 +6,7 @@
     "heroSubtitle": "Text to speech, speech to text, and translation—powered by Sarvam AI. Use shared credits or your own API key.",
     "getStartedFree": "Get started free",
     "tryNow": "Try now",
+    "tryNowHint": "No account needed — limited tries per tool.",
     "howItWorks": "How it works",
     "sectionTitle": "Everything you need",
     "sectionSubtitle": "One dashboard. Three tools. All Indian languages.",
@@ -41,6 +42,8 @@
   "learn": {
     "title": "How VaakkuAI works",
     "subtitle": "Everything you need to know about using the app and how usage is billed.",
+    "tryWithoutSignupTitle": "Try without signing up",
+    "tryWithoutSignupBody": "You can try each tool a few times with no account: 3 Text-to-Speech tries, 2 Speech-to-Text tries, and 3 Translation tries. Sign up for full access, 1,000 free credits, history, and the option to use your own Sarvam API key.",
     "whatTitle": "What is VaakkuAI?",
     "whatBody": "VaakkuAI lets you use Sarvam AI's Indian-language models inside one app: convert text to speech, speech to text, and translate between English and Indian languages. You can use it in two ways—with your own Sarvam API key or with shared app credits.",
     "twoWaysTitle": "Two ways to use the app",
@@ -59,6 +62,7 @@
   "dashboard": {
     "intro": "Choose an AI tool to get started.",
     "learnLink": "New? See how it works",
+    "tryModeInfo": "You're trying without an account — limited tries per tool (3 TTS, 2 STT, 3 Translate). Sign up for full access and 1,000 free credits.",
     "tts": { "title": "Text to Speech", "description": "Convert text to natural Indian language speech." },
     "stt": { "title": "Speech to Text", "description": "Upload audio and get a transcript." },
     "translate": { "title": "Translate", "description": "Translate between English and Indian languages." }

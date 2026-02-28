@@ -17,6 +17,7 @@ import MicIcon from '@mui/icons-material/Mic';
 import TranslateIcon from '@mui/icons-material/Translate';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useLocale } from '../context/LocaleContext';
+import { ROUTES } from '../constants/routes';
 
 const featureKeys = [
   { key: 'tts', icon: <RecordVoiceOverIcon sx={{ fontSize: 36 }} /> },
@@ -28,6 +29,7 @@ export default function Landing() {
   const theme = useTheme();
   const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
   const { locale, setLocale, t, options } = useLocale();
+  const isLoggedIn = !!localStorage.getItem('token');
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
@@ -78,15 +80,27 @@ export default function Landing() {
               ))}
             </Select>
           </FormControl>
-          <Button
-            component={RouterLink}
-            to="/login"
-            variant="outlined"
-            size={isSmall ? 'small' : 'medium'}
-            sx={{ borderRadius: 2 }}
-          >
-            {t('landing.signIn')}
-          </Button>
+          {isLoggedIn ? (
+            <Button
+              component={RouterLink}
+              to={ROUTES.DASHBOARD_INDEX}
+              variant="outlined"
+              size={isSmall ? 'small' : 'medium'}
+              sx={{ borderRadius: 2 }}
+            >
+              {t('nav.dashboard')}
+            </Button>
+          ) : (
+            <Button
+              component={RouterLink}
+              to={ROUTES.LOGIN}
+              variant="outlined"
+              size={isSmall ? 'small' : 'medium'}
+              sx={{ borderRadius: 2 }}
+            >
+              {t('landing.signIn')}
+            </Button>
+          )}
         </Box>
       </Box>
 
@@ -102,31 +116,40 @@ export default function Landing() {
         }}
       >
         <Container maxWidth="md">
-          <Typography
-            variant={isSmall ? 'h4' : 'h3'}
-            fontWeight={700}
+          <Box
             sx={{
-              letterSpacing: '-0.03em',
-              lineHeight: 1.2,
-              mb: 2,
-              textShadow: '0 1px 2px rgba(0,0,0,0.2)',
-            }}
-          >
-            {t('landing.heroTitle')}
-          </Typography>
-          <Typography
-            variant="body1"
-            sx={{
-              fontSize: { xs: '1rem', sm: '1.15rem' },
-              opacity: 0.95,
-              maxWidth: 520,
-              mx: 'auto',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              textAlign: 'center',
               mb: 4,
-              lineHeight: 1.6,
             }}
           >
-            {t('landing.heroSubtitle')}
-          </Typography>
+            <Typography
+              variant={isSmall ? 'h4' : 'h3'}
+              fontWeight={700}
+              sx={{
+                letterSpacing: '-0.03em',
+                lineHeight: 1.2,
+                mb: 2,
+                textShadow: '0 1px 2px rgba(0,0,0,0.2)',
+                maxWidth: 520,
+              }}
+            >
+              {t('landing.heroTitle')}
+            </Typography>
+            <Typography
+              variant="body1"
+              sx={{
+                fontSize: { xs: '1rem', sm: '1.15rem' },
+                opacity: 0.95,
+                maxWidth: 520,
+                lineHeight: 1.6,
+              }}
+            >
+              {t('landing.heroSubtitle')}
+            </Typography>
+          </Box>
           <Stack
             direction={{ xs: 'column', sm: 'row' }}
             spacing={2}
@@ -135,7 +158,7 @@ export default function Landing() {
           >
             <Button
               component={RouterLink}
-              to="/signup"
+              to={isLoggedIn ? ROUTES.DASHBOARD_INDEX : ROUTES.SIGNUP}
               variant="contained"
               size="large"
               endIcon={<ArrowForwardIcon />}
@@ -151,11 +174,11 @@ export default function Landing() {
                 },
               }}
             >
-              {t('landing.getStartedFree')}
+              {isLoggedIn ? t('nav.dashboard') : t('landing.getStartedFree')}
             </Button>
             <Button
               component={RouterLink}
-              to="/dashboard"
+              to={ROUTES.DASHBOARD_INDEX}
               variant="outlined"
               size="large"
               sx={{
@@ -187,6 +210,12 @@ export default function Landing() {
               {t('landing.howItWorks')}
             </Button>
           </Stack>
+          <Typography
+            variant="caption"
+            sx={{ display: 'block', textAlign: 'center', mt: 1.5, opacity: 0.9 }}
+          >
+            {t('landing.tryNowHint') || 'No account needed — limited tries per tool.'}
+          </Typography>
         </Container>
       </Box>
 
@@ -255,66 +284,70 @@ export default function Landing() {
           ))}
         </Stack>
 
-        {/* Bottom CTA */}
+        {/* Bottom CTA - hide when logged in */}
+        {!isLoggedIn && (
+          <Box
+            sx={{
+              mt: { xs: 8, sm: 10 },
+              py: 5,
+              px: 2,
+              borderRadius: 2,
+              bgcolor: 'primary.main',
+              color: '#fff',
+              textAlign: 'center',
+            }}
+          >
+            <Typography variant="h6" fontWeight={600} gutterBottom>
+              {t('landing.ctaTitle')}
+            </Typography>
+            <Typography variant="body2" sx={{ opacity: 0.9, mb: 2 }}>
+              {t('landing.ctaSubtitle')}
+            </Typography>
+            <Button
+              component={RouterLink}
+              to={ROUTES.SIGNUP}
+              variant="contained"
+              size="large"
+              endIcon={<ArrowForwardIcon />}
+              sx={{
+                bgcolor: '#fff',
+                color: 'primary.main',
+                borderRadius: 2,
+                fontWeight: 600,
+                '&:hover': { bgcolor: 'rgba(255,255,255,0.92)' },
+              }}
+            >
+              {t('landing.createAccount')}
+            </Button>
+          </Box>
+        )}
+      </Container>
+
+      {/* Footer - sign in link only when not logged in */}
+      {!isLoggedIn && (
         <Box
+          component="footer"
           sx={{
-            mt: { xs: 8, sm: 10 },
-            py: 5,
+            py: 2,
             px: 2,
-            borderRadius: 2,
-            bgcolor: 'primary.main',
-            color: '#fff',
+            borderTop: '1px solid',
+            borderColor: 'divider',
             textAlign: 'center',
           }}
         >
-          <Typography variant="h6" fontWeight={600} gutterBottom>
-            {t('landing.ctaTitle')}
+          <Typography variant="body2" color="text.secondary">
+            {t('landing.footerAlready')}{' '}
+            <Button
+              component={RouterLink}
+              to={ROUTES.LOGIN}
+              size="small"
+              sx={{ textTransform: 'none', fontWeight: 600 }}
+            >
+              {t('landing.signInLink')}
+            </Button>
           </Typography>
-          <Typography variant="body2" sx={{ opacity: 0.9, mb: 2 }}>
-            {t('landing.ctaSubtitle')}
-          </Typography>
-          <Button
-            component={RouterLink}
-            to="/signup"
-            variant="contained"
-            size="large"
-            endIcon={<ArrowForwardIcon />}
-            sx={{
-              bgcolor: '#fff',
-              color: 'primary.main',
-              borderRadius: 2,
-              fontWeight: 600,
-              '&:hover': { bgcolor: 'rgba(255,255,255,0.92)' },
-            }}
-          >
-            {t('landing.createAccount')}
-          </Button>
         </Box>
-      </Container>
-
-      {/* Footer */}
-      <Box
-        component="footer"
-        sx={{
-          py: 2,
-          px: 2,
-          borderTop: '1px solid',
-          borderColor: 'divider',
-          textAlign: 'center',
-        }}
-      >
-        <Typography variant="body2" color="text.secondary">
-          {t('landing.footerAlready')}{' '}
-          <Button
-            component={RouterLink}
-            to="/login"
-            size="small"
-            sx={{ textTransform: 'none', fontWeight: 600 }}
-          >
-            {t('landing.signInLink')}
-          </Button>
-        </Typography>
-      </Box>
+      )}
     </Box>
   );
 }

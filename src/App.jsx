@@ -20,7 +20,6 @@ function RootRoute() {
   const path = location.pathname;
 
   if (!token) {
-    if (path === ROUTES.DASHBOARD_INDEX) return <Landing />;
     if (ANONYMOUS_PATHS.includes(path)) {
       return (
         <Layout>

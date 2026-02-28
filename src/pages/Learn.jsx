@@ -31,6 +31,15 @@ export default function Learn() {
       </Typography>
 
       <Paper sx={{ p: { xs: 2, sm: 3 }, mb: 3 }}>
+        <Typography variant="h6" fontWeight={600} gutterBottom>
+          {t('learn.tryWithoutSignupTitle') || 'Try without signing up'}
+        </Typography>
+        <Typography color="text.secondary" sx={{ mb: 2 }}>
+          {t('learn.tryWithoutSignupBody') || "You can try each tool a few times with no account: 3 Text-to-Speech tries, 2 Speech-to-Text tries, and 3 Translation tries. Sign up for full access, 1,000 free credits, history, and the option to use your own Sarvam API key."}
+        </Typography>
+      </Paper>
+
+      <Paper sx={{ p: { xs: 2, sm: 3 }, mb: 3 }}>
         <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mb: 2 }}>
           <InfoIcon color="primary" sx={{ mt: 0.25 }} />
           <Box>
