@@ -1,6 +1,7 @@
 import { Link, Navigate } from 'react-router-dom';
 import { useLocale } from '../context/LocaleContext';
 import { ROUTES } from '../constants/routes';
+import { LandingLocaleSelect } from '../components/LandingLocaleSelect';
 
 const featureKeys = [
   { key: 'tts', path: ROUTES.TTS, labelKey: 'landing.features.tts' },
@@ -9,51 +10,64 @@ const featureKeys = [
 ];
 
 export default function Landing() {
-  const { locale, setLocale, t, options } = useLocale();
+  const { t } = useLocale();
   if (localStorage.getItem('token')) return <Navigate to={ROUTES.TTS} replace />;
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--color-bg)' }}>
       <header
-        className="fixed left-0 right-0 top-0 z-10 flex items-center justify-between border-b px-4 py-3 md:px-6"
+        className="fixed left-0 right-0 top-0 z-10 flex flex-col border-b md:flex-row md:items-center md:justify-between md:px-6"
         style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}
       >
-        <div className="flex items-center gap-3">
-          <Link to={ROUTES.LANDING} className="text-lg font-bold" style={{ color: 'var(--color-accent)', textDecoration: 'none' }}>
+        <div className="flex min-h-12 items-center justify-between px-4 py-2 md:py-3 md:px-0">
+          <Link to={ROUTES.LANDING} className="text-lg font-bold shrink-0" style={{ color: 'var(--color-accent)', textDecoration: 'none' }}>
             {t('landing.brand')}
           </Link>
-          <select
-            value={locale}
-            onChange={(e) => setLocale(e.target.value)}
-            className="rounded border bg-transparent py-1.5 pl-2 pr-8 text-sm transition-colors duration-150"
-            style={{ borderColor: 'var(--color-border)', color: 'var(--color-text)' }}
-            aria-label="Language"
-          >
-            {options.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
+          <div className="flex items-center gap-2 md:hidden">
+            <Link
+              to={ROUTES.LOGIN}
+              className="rounded border py-2.5 px-4 text-sm font-medium transition-colors duration-150 min-h-[44px] flex items-center"
+              style={{ borderColor: 'var(--color-border)', color: 'var(--color-text)', textDecoration: 'none' }}
+            >
+              {t('landing.signIn')}
+            </Link>
+            <Link
+              to={ROUTES.SIGNUP}
+              className="rounded py-2.5 px-4 text-sm font-medium text-white transition-opacity duration-150 min-h-[44px] flex items-center"
+              style={{ backgroundColor: 'var(--color-accent)', color: 'var(--color-surface)', textDecoration: 'none' }}
+            >
+              {t('nav.signUp')}
+            </Link>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Link
-            to={ROUTES.LOGIN}
-            className="rounded border py-1.5 px-3 text-sm font-medium transition-colors duration-150"
-            style={{ borderColor: 'var(--color-border)', color: 'var(--color-text)', textDecoration: 'none' }}
-          >
-            {t('landing.signIn')}
-          </Link>
-          <Link
-            to={ROUTES.SIGNUP}
-            className="rounded py-1.5 px-3 text-sm font-medium text-white transition-opacity duration-150"
-            style={{ backgroundColor: 'var(--color-accent)', color: 'var(--color-surface)', textDecoration: 'none' }}
-          >
-            {t('nav.signUp')}
-          </Link>
+        <div className="flex flex-col gap-1.5 border-t px-4 py-3 md:flex-row md:items-center md:border-t-0 md:py-0 md:px-0 md:gap-3 md:flex-none" style={{ borderColor: 'var(--color-border)' }}>
+          <label className="landing-locale-label text-sm font-medium shrink-0 md:sr-only" style={{ color: 'var(--color-text-muted)' }} id="landing-locale-label">
+            Language
+          </label>
+          <div className="flex-1 min-w-0 md:flex-none relative z-[2]">
+            <LandingLocaleSelect />
+          </div>
+          <div className="hidden md:flex md:items-center md:gap-2">
+            <Link
+              to={ROUTES.LOGIN}
+              className="rounded border py-1.5 px-3 text-sm font-medium transition-colors duration-150"
+              style={{ borderColor: 'var(--color-border)', color: 'var(--color-text)', textDecoration: 'none' }}
+            >
+              {t('landing.signIn')}
+            </Link>
+            <Link
+              to={ROUTES.SIGNUP}
+              className="rounded py-1.5 px-3 text-sm font-medium text-white transition-opacity duration-150"
+              style={{ backgroundColor: 'var(--color-accent)', color: 'var(--color-surface)', textDecoration: 'none' }}
+            >
+              {t('nav.signUp')}
+            </Link>
+          </div>
         </div>
       </header>
 
       <section
-        className="px-4 pb-12 pt-24 text-center md:pb-16 md:pt-28"
+        className="px-4 pb-12 pt-28 text-center md:pb-16 md:pt-28"
         style={{ backgroundColor: 'var(--color-accent)', color: '#fff' }}
       >
         <div className="mx-auto max-w-2xl">

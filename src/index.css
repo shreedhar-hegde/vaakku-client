@@ -100,3 +100,38 @@ body {
   height: 8px;
   cursor: pointer;
 }
+
+/* Mobile: safe area for bottom nav (notched devices) */
+.mobile-nav {
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+/* Landing: locale pill trigger — min height for touch on mobile */
+.landing-locale-trigger {
+  min-height: 44px;
+}
+@media (min-width: 768px) {
+  .landing-locale-trigger {
+    min-height: 0;
+  }
+}
+
+/* Landing: locale dropdown — above header, bottom sheet on mobile */
+.landing-locale-content {
+  z-index: 100;
+}
+@media (max-width: 767px) {
+  .landing-locale-content {
+    position: fixed !important;
+    inset: auto 0 0 0 !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    min-width: unset !important;
+    border-radius: 16px 16px 0 0 !important;
+    max-height: min(50vh, 280px);
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+  .landing-locale-item {
+    min-height: 48px !important;
+  }
+}

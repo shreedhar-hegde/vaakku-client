@@ -56,14 +56,6 @@ export default function Translate() {
   const [error, setError] = useState('');
   const [translated, setTranslated] = useState('');
 
-  const [swapRotated, setSwapRotated] = useState(false);
-  const swapLangs = () => {
-    if (sourceLang === 'auto') return;
-    setSwapRotated((r) => !r);
-    setSourceLang(targetLang);
-    setTargetLang(sourceLang);
-  };
-
   const isAnonymous = !user;
   const maxChars = isAnonymous ? ANON_MAX_CHARS.translate : 1000;
   const anonRemaining = getAnonymousRemaining('translate');
@@ -179,23 +171,7 @@ export default function Translate() {
           </form>
         </div>
 
-        {/* Swap button */}
-        <div
-          className="flex shrink-0 items-center justify-center border-b py-2 md:w-12 md:flex-col md:border-b-0 md:border-l"
-          style={{ borderColor: 'var(--color-border)' }}
-        >
-          <button
-            type="button"
-            onClick={swapLangs}
-            disabled={sourceLang === 'auto'}
-            className={`swap-rotate flex h-9 w-9 items-center justify-center rounded border transition-[transform,border-color,opacity] duration-150 hover:border-[var(--color-accent)] disabled:opacity-40 ${swapRotated ? 'translate-x-0 rotate-180' : ''}`}
-            style={{ borderColor: 'var(--color-border)' }}
-            aria-label="Swap languages"
-            title="Swap languages"
-          >
-            <span className="text-lg" aria-hidden>⇄</span>
-          </button>
-        </div>
+        <div className="hidden shrink-0 md:block md:w-px" style={{ backgroundColor: 'var(--color-border)' }} aria-hidden />
 
         {/* Right panel: output */}
         <div className="flex min-h-[200px] flex-1 flex-col border-t md:min-w-0 md:border-t-0" style={{ borderColor: 'var(--color-border)' }}>
