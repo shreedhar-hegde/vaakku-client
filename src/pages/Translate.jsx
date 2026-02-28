@@ -1,18 +1,5 @@
 import { useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
-import {
-  Paper,
-  Typography,
-  TextField,
-  Button,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Alert,
-  CircularProgress,
-  Box,
-} from '@mui/material';
+import { Link } from 'react-router-dom';
 import { ai } from '../api/axios';
 import { useUser } from '../context/UserContext';
 import { useLocale } from '../context/LocaleContext';
@@ -23,21 +10,9 @@ import {
   incrementAnonymousUsage,
   setAnonymousUsageAtLimit,
 } from '../utils/anonymousUsage';
-
-const LANGUAGES = [
-  { value: 'auto', label: 'Auto-detect' },
-  { value: 'en-IN', label: 'English' },
-  { value: 'hi-IN', label: 'Hindi' },
-  { value: 'bn-IN', label: 'Bengali' },
-  { value: 'ta-IN', label: 'Tamil' },
-  { value: 'te-IN', label: 'Telugu' },
-  { value: 'gu-IN', label: 'Gujarati' },
-  { value: 'kn-IN', label: 'Kannada' },
-  { value: 'ml-IN', label: 'Malayalam' },
-  { value: 'mr-IN', label: 'Marathi' },
-  { value: 'pa-IN', label: 'Punjabi' },
-  { value: 'od-IN', label: 'Odia' },
-];
+import { ROUTES } from '../constants/routes';
+import { LANGUAGES_WITH_AUTO, LANGUAGES_TARGET } from '../constants/languages';
+import { LanguageSelect } from '../components/LanguageSelect';
 
 export default function Translate() {
   const { user, refreshUser } = useUser();
@@ -79,79 +54,138 @@ export default function Translate() {
     }
   };
 
+  const hasInput = input.trim().length > 0;
+  const hasOutput = translated.length > 0;
+
   return (
-    <Box sx={{ py: { xs: 2, sm: 3 } }}>
-      <Typography variant="h4" gutterBottom sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}>
-        Translate
-      </Typography>
-      <Typography color="text.secondary" sx={{ mb: 2 }}>
-        {isAnonymous
-          ? `Translate between English and Indian languages (up to ${ANON_MAX_CHARS.translate} characters).`
-          : 'Translate between English and Indian languages (Mayura; up to 1,000 characters).'}
-      </Typography>
+    <div className="py-6">
       {isAnonymous && (
-        <Alert severity="info" sx={{ mb: 2 }}>
-          {anonLimitReached
-            ? t('anonymous.limitReached') + ' '
-            : t('anonymous.translateTriesLeft').replace('{{remaining}}', anonRemaining).replace('{{limit}}', ANON_LIMITS.translate) + ' '}
-          <Button component={RouterLink} to="/signup" size="small" sx={{ mt: 0.5 }}>
-            {t('anonymous.signUpForMore')}
-          </Button>
-        </Alert>
-      )}
-      {error && (
-        <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>
-          {error}
-        </Alert>
-      )}
-      <Paper sx={{ p: { xs: 2, sm: 3 } }}>
-        <form onSubmit={handleSubmit}>
-          <TextField
-            fullWidth
-            multiline
-            rows={4}
-            label="Text to translate"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Enter text..."
-            inputProps={{ maxLength: maxChars }}
-            helperText={`${input.length}/${maxChars}`}
-            margin="normal"
-          />
-          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mt: 2 }}>
-            <FormControl sx={{ minWidth: 160 }}>
-              <InputLabel>From</InputLabel>
-              <Select value={sourceLang} label="From" onChange={(e) => setSourceLang(e.target.value)}>
-                {LANGUAGES.map((l) => (
-                  <MenuItem key={l.value} value={l.value}>{l.label}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <FormControl sx={{ minWidth: 160 }}>
-              <InputLabel>To</InputLabel>
-              <Select value={targetLang} label="To" onChange={(e) => setTargetLang(e.target.value)}>
-                {LANGUAGES.filter((l) => l.value !== 'auto').map((l) => (
-                  <MenuItem key={l.value} value={l.value}>{l.label}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Box>
-          <Button
-            type="submit"
-            variant="contained"
-            sx={{ mt: 2 }}
-            disabled={loading || !input.trim() || (isAnonymous && anonLimitReached)}
+        <div
+          className="mb-4 flex flex-wrap items-center gap-2 rounded border py-2 px-3 text-sm"
+          style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-surface)' }}
+        >
+          <span style={{ color: 'var(--color-text)' }}>
+            {anonLimitReached
+              ? t('anonymous.limitReached')
+              : t('anonymous.translateTriesLeft')
+                  .replace('{{remaining}}', anonRemaining)
+                  .replace('{{limit}}', ANON_LIMITS.translate)}
+          </span>
+          <Link
+            to={ROUTES.SIGNUP}
+            className="font-medium underline transition-opacity duration-150 hover:opacity-90"
+            style={{ color: 'var(--color-accent)' }}
           >
-            {loading ? <CircularProgress size={24} /> : 'Translate'}
-          </Button>
-        </form>
-        {translated && (
-          <Box sx={{ mt: 3, p: 2, bgcolor: 'grey.100', borderRadius: 1 }}>
-            <Typography variant="subtitle2" color="text.secondary">Translation</Typography>
-            <Typography sx={{ mt: 1, whiteSpace: 'pre-wrap' }}>{translated}</Typography>
-          </Box>
-        )}
-      </Paper>
-    </Box>
+            {t('anonymous.signUpForMore')}
+          </Link>
+        </div>
+      )}
+
+      {error && (
+        <div
+          className="mb-4 flex items-center justify-between rounded border py-2 px-3 text-sm"
+          style={{ borderColor: '#dc2626', backgroundColor: '#fef2f2', color: '#b91c1c' }}
+        >
+          <span>{error}</span>
+          <button
+            type="button"
+            onClick={() => setError('')}
+            className="shrink-0 pl-2 underline"
+            aria-label="Dismiss"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
+      <div className="flex min-h-[420px] flex-col rounded-lg md:flex-row" style={{ backgroundColor: 'var(--color-surface)' }}>
+        {/* Left panel: input */}
+        <div className="flex flex-1 flex-col md:min-w-0 md:rounded-l-lg">
+          <div className="px-3 py-2">
+            <LanguageSelect
+              value={sourceLang}
+              onValueChange={setSourceLang}
+              options={LANGUAGES_WITH_AUTO}
+              placeholder="Source language"
+              aria-label="Source language"
+            />
+          </div>
+          <form onSubmit={handleSubmit} className="flex flex-1 flex-col p-3 pt-0">
+            <textarea
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              maxLength={maxChars}
+              placeholder="Enter text to translate..."
+              className="min-h-[200px] flex-1 resize-none border-0 bg-transparent p-0 text-base outline-none placeholder:opacity-60"
+              style={{
+                color: 'var(--color-text)',
+                fontFamily: 'var(--font-body)',
+                lineHeight: 1.85,
+              }}
+              aria-label="Text to translate"
+            />
+            <div className="mt-2 flex justify-end">
+              <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                {input.length}/{maxChars}
+              </span>
+            </div>
+            {hasInput && (
+              <button
+                type="submit"
+                disabled={loading || (isAnonymous && anonLimitReached)}
+                className="mt-3 w-full rounded-lg py-2.5 text-sm font-medium text-white transition-opacity duration-150 disabled:opacity-50"
+                style={{ backgroundColor: 'var(--color-accent)' }}
+              >
+                {loading ? 'Translating…' : 'Translate'}
+              </button>
+            )}
+          </form>
+        </div>
+
+        {/* Subtle divider (no swap button) */}
+        <div className="hidden shrink-0 md:block md:w-px" style={{ backgroundColor: 'var(--color-border)' }} aria-hidden />
+
+        {/* Right panel: output */}
+        <div className="flex min-h-[200px] flex-1 flex-col border-t md:min-w-0 md:border-t-0 md:rounded-r-lg" style={{ borderColor: 'var(--color-border)' }}>
+          <div className="px-3 py-2" style={{ borderColor: 'var(--color-border)' }}>
+            <LanguageSelect
+              value={targetLang}
+              onValueChange={setTargetLang}
+              options={LANGUAGES_TARGET}
+              placeholder="Target language"
+              aria-label="Target language"
+            />
+          </div>
+          <div className="content-indic relative flex-1 whitespace-pre-wrap p-3" style={{ minHeight: 160 }}>
+            {hasOutput ? (
+              translated
+            ) : (
+              <div className="flex flex-col items-center justify-center py-8">
+                <span
+                  className="mb-3 text-[100px] leading-none"
+                  style={{ opacity: 0.04, fontFamily: 'var(--font-body)' }}
+                  aria-hidden
+                >
+                  క
+                </span>
+                <p className="text-center font-semibold" style={{ color: 'var(--color-text)' }}>
+                  Translation
+                </p>
+                <p className="mt-1 max-w-xs text-center text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                  Enter text and click Translate. Result appears here.
+                </p>
+                <Link
+                  to={ROUTES.LEARN}
+                  className="mt-3 rounded border py-2 px-4 text-sm font-medium transition-colors duration-150"
+                  style={{ borderColor: 'var(--color-border)', color: 'var(--color-text)' }}
+                >
+                  How it works
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

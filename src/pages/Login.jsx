@@ -1,14 +1,10 @@
 import { useState } from 'react';
-import { Link as RouterLink, useNavigate, Navigate } from 'react-router-dom';
-import { Box, Paper, Typography, TextField, Button, Link, Alert } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
-
+import { Link, useNavigate, Navigate } from 'react-router-dom';
 import { auth } from '../api/axios';
 import { useLocale } from '../context/LocaleContext';
 import { ROUTES } from '../constants/routes';
 
 export default function Login() {
-  const theme = useTheme();
   const navigate = useNavigate();
   const { t } = useLocale();
   const [email, setEmail] = useState('');
@@ -37,116 +33,70 @@ export default function Login() {
   };
 
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        p: 2,
-        position: 'relative',
-        overflow: 'hidden',
-        background: `linear-gradient(140deg, ${theme.palette.primary.main}08 0%, ${theme.palette.primary.main}14 40%, ${theme.palette.background.default} 100%)`,
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          top: '-20%',
-          right: '-10%',
-          width: '50%',
-          height: '60%',
-          borderRadius: '50%',
-          background: `radial-gradient(circle, ${theme.palette.primary.main}12 0%, transparent 70%)`,
-          pointerEvents: 'none',
-        },
-        '&::after': {
-          content: '""',
-          position: 'absolute',
-          bottom: '-15%',
-          left: '-15%',
-          width: '45%',
-          height: '50%',
-          borderRadius: '50%',
-          background: `radial-gradient(circle, ${theme.palette.primary.main}0a 0%, transparent 70%)`,
-          pointerEvents: 'none',
-        },
-      }}
-    >
-      <Box
-        component="header"
-        sx={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 10,
-          py: 2,
-          px: 2,
-          display: 'flex',
-          alignItems: 'center',
-          bgcolor: 'rgba(255,255,255,0.8)',
-          backdropFilter: 'saturate(180%) blur(12px)',
-          borderBottom: '1px solid',
-          borderColor: 'divider',
-        }}
+    <div className="relative flex min-h-screen flex-col items-center overflow-hidden p-4" style={{ backgroundColor: 'var(--color-bg)' }}>
+      <header
+        className="fixed left-0 right-0 top-0 z-10 flex items-center border-b px-4 py-3"
+        style={{ backgroundColor: 'rgba(255,255,255,0.9)', borderColor: 'var(--color-border)' }}
       >
-        <Typography
-          component={RouterLink}
-          to="/landing"
-          variant="h6"
-          fontWeight={700}
-          sx={{
-            color: 'primary.main',
-            textDecoration: 'none',
-            letterSpacing: '-0.02em',
-            '&:hover': { opacity: 0.85 },
-          }}
-        >
+        <Link to={ROUTES.LANDING} className="text-lg font-bold" style={{ color: 'var(--color-accent)', textDecoration: 'none' }}>
           {t('landing.brand')}
-        </Typography>
-      </Box>
-      <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', mt: 8 }}>
-      <Paper elevation={2} sx={{ p: 4, maxWidth: 400, width: '100%', position: 'relative', zIndex: 1, borderRadius: 2 }}>
-        <Typography variant="h5" gutterBottom>
-          Sign in to VaakkuAI
-        </Typography>
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }} variant="filled">
-            {error}
-          </Alert>
-        )}
-        <form onSubmit={handleSubmit}>
-          <TextField
-            fullWidth
-            label="Email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            margin="normal"
-            autoComplete="email"
-          />
-          <TextField
-            fullWidth
-            label="Password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            margin="normal"
-            autoComplete="current-password"
-          />
-          <Button type="submit" fullWidth variant="contained" sx={{ mt: 3 }} disabled={loading}>
-            {loading ? 'Signing in…' : 'Sign in'}
-          </Button>
-        </form>
-        <Typography sx={{ mt: 2 }}>
-          Don't have an account?{' '}
-          <Link component={RouterLink} to="/signup">
-            Sign up
-          </Link>
-        </Typography>
-      </Paper>
-      </Box>
-    </Box>
+        </Link>
+      </header>
+      <div className="mt-16 flex flex-1 items-center justify-center w-full">
+        <div
+          className="relative z-10 w-full max-w-md rounded-lg border p-6"
+          style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}
+        >
+          <h1 className="mb-4 text-xl font-semibold" style={{ color: 'var(--color-text)' }}>
+            Sign in to VaakkuAI
+          </h1>
+          {error && (
+            <div className="mb-4 rounded border py-2 px-3 text-sm" style={{ borderColor: '#dc2626', backgroundColor: '#fef2f2', color: '#b91c1c' }}>
+              {error}
+            </div>
+          )}
+          <form onSubmit={handleSubmit}>
+            <label className="mb-1 block text-sm" style={{ color: 'var(--color-text-muted)' }}>
+              Email
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              autoComplete="email"
+              className="mb-3 w-full rounded border py-2 px-3 text-sm"
+              style={{ borderColor: 'var(--color-border)' }}
+            />
+            <label className="mb-1 block text-sm" style={{ color: 'var(--color-text-muted)' }}>
+              Password
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              autoComplete="current-password"
+              className="mb-4 w-full rounded border py-2 px-3 text-sm"
+              style={{ borderColor: 'var(--color-border)' }}
+            />
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full rounded py-2.5 text-sm font-medium text-white transition-opacity duration-150 disabled:opacity-50"
+              style={{ backgroundColor: 'var(--color-accent)' }}
+            >
+              {loading ? 'Signing in…' : 'Sign in'}
+            </button>
+          </form>
+          <p className="mt-4 text-sm" style={{ color: 'var(--color-text)' }}>
+            Don't have an account?{' '}
+            <Link to={ROUTES.SIGNUP} className="underline" style={{ color: 'var(--color-accent)' }}>
+              Sign up
+            </Link>
+          </p>
+        </div>
+      </div>
+    </div>
   );
 }

@@ -1,23 +1,5 @@
 import { useState, useRef } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
-import {
-  Paper,
-  Typography,
-  Button,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Alert,
-  CircularProgress,
-  Box,
-  Tabs,
-  Tab,
-} from '@mui/material';
-import UploadFileIcon from '@mui/icons-material/UploadFile';
-import MicIcon from '@mui/icons-material/Mic';
-import StopIcon from '@mui/icons-material/Stop';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import { Link } from 'react-router-dom';
 import { ai } from '../api/axios';
 import { useUser } from '../context/UserContext';
 import { useLocale } from '../context/LocaleContext';
@@ -27,6 +9,7 @@ import {
   incrementAnonymousUsage,
   setAnonymousUsageAtLimit,
 } from '../utils/anonymousUsage';
+import { ROUTES } from '../constants/routes';
 
 const MODES = [
   { value: 'transcribe', label: 'Transcribe (same language)' },
@@ -35,10 +18,39 @@ const MODES = [
   { value: 'codemix', label: 'Code-mixed' },
 ];
 
+function UploadIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <polyline points="17 8 12 3 7 8" />
+      <line x1="12" y1="3" x2="12" y2="15" />
+    </svg>
+  );
+}
+
+function MicIcon() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+      <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+      <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+      <line x1="12" y1="19" x2="12" y2="23" />
+      <line x1="8" y1="23" x2="16" y2="23" />
+    </svg>
+  );
+}
+
+function StopIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <rect x="6" y="6" width="12" height="12" />
+    </svg>
+  );
+}
+
 export default function STT() {
   const { user, refreshUser } = useUser();
   const { t } = useLocale();
-  const [tab, setTab] = useState(0); // 0 = upload, 1 = record
+  const [tab, setTab] = useState(0);
   const isAnonymous = !user;
   const anonRemaining = getAnonymousRemaining('stt');
   const anonLimitReached = isAnonymous && anonRemaining <= 0;
@@ -48,7 +60,6 @@ export default function STT() {
   const [error, setError] = useState('');
   const [result, setResult] = useState(null);
 
-  // Recording state
   const [recording, setRecording] = useState(false);
   const [recordedBlob, setRecordedBlob] = useState(null);
   const [recordDuration, setRecordDuration] = useState(0);
@@ -76,7 +87,7 @@ export default function STT() {
         if (e.data.size) chunksRef.current.push(e.data);
       };
       recorder.onstop = () => {
-        stream.getTracks().forEach((t) => t.stop());
+        stream.getTracks().forEach((tr) => tr.stop());
         if (chunksRef.current.length) {
           const blob = new Blob(chunksRef.current, { type: recorder.mimeType || 'audio/webm' });
           setRecordedBlob(blob);
@@ -139,129 +150,236 @@ export default function STT() {
   };
 
   const formatTime = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+  const isEmpty = !result && !file && !recordedBlob && !recording;
 
   return (
-    <Box sx={{ py: { xs: 2, sm: 3 } }}>
-      <Typography variant="h4" gutterBottom sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}>
-        Speech to Text
-      </Typography>
-      <Typography color="text.secondary" sx={{ mb: 2 }}>
-        Upload an audio file or record live from your microphone. Transcribe or translate to English.
-      </Typography>
+    <div className="py-6">
       {isAnonymous && (
-        <Alert severity="info" sx={{ mb: 2 }}>
-          {anonLimitReached
-            ? t('anonymous.limitReached') + ' '
-            : t('anonymous.sttTriesLeft').replace('{{remaining}}', anonRemaining).replace('{{limit}}', ANON_LIMITS.stt) + ' '}
-          <Button component={RouterLink} to="/signup" size="small" sx={{ mt: 0.5 }}>
+        <div
+          className="mb-4 flex flex-wrap items-center gap-2 rounded border py-2 px-3 text-sm"
+          style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-surface)' }}
+        >
+          <span style={{ color: 'var(--color-text)' }}>
+            {anonLimitReached
+              ? t('anonymous.limitReached')
+              : t('anonymous.sttTriesLeft')
+                  .replace('{{remaining}}', anonRemaining)
+                  .replace('{{limit}}', ANON_LIMITS.stt)}
+          </span>
+          <Link
+            to={ROUTES.SIGNUP}
+            className="font-medium underline transition-opacity duration-150 hover:opacity-90"
+            style={{ color: 'var(--color-accent)' }}
+          >
             {t('anonymous.signUpForMore')}
-          </Button>
-        </Alert>
+          </Link>
+        </div>
       )}
-      {error && (
-        <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>
-          {error}
-        </Alert>
-      )}
-      <Paper sx={{ p: { xs: 2, sm: 3 } }}>
-        <FormControl fullWidth sx={{ mb: 2 }}>
-          <InputLabel>Output mode</InputLabel>
-          <Select value={mode} label="Output mode" onChange={(e) => setMode(e.target.value)}>
-            {MODES.map((m) => (
-              <MenuItem key={m.value} value={m.value}>{m.label}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
 
-        <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ mb: 2 }}>
-          <Tab label="Upload file" icon={<UploadFileIcon />} iconPosition="start" />
-          <Tab label="Record live" icon={<MicIcon />} iconPosition="start" />
-        </Tabs>
+      {error && (
+        <div
+          className="mb-4 flex items-center justify-between rounded border py-2 px-3 text-sm"
+          style={{ borderColor: '#dc2626', backgroundColor: '#fef2f2', color: '#b91c1c' }}
+        >
+          <span>{error}</span>
+          <button type="button" onClick={() => setError('')} className="shrink-0 pl-2 underline" aria-label="Dismiss">
+            Dismiss
+          </button>
+        </div>
+      )}
+
+      <div
+        className="border p-4 md:p-6"
+        style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-surface)' }}
+      >
+        <div className="mb-4 flex overflow-x-auto border-b gap-0" style={{ borderColor: 'var(--color-border)' }}>
+          {MODES.map((m) => (
+            <button
+              key={m.value}
+              type="button"
+              onClick={() => setMode(m.value)}
+              className="shrink-0 border-b-2 px-3 py-2 text-sm transition-colors duration-150"
+              style={{
+                borderBottomColor: mode === m.value ? 'var(--color-accent)' : 'transparent',
+                color: mode === m.value ? 'var(--color-accent)' : 'var(--color-text-muted)',
+                fontWeight: mode === m.value ? 600 : 400,
+                backgroundColor: 'transparent',
+              }}
+            >
+              {m.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="mb-4 flex gap-0 border-b" style={{ borderColor: 'var(--color-border)' }}>
+          <button
+            type="button"
+            onClick={() => setTab(0)}
+            className="border-b-2 px-4 py-2 text-sm transition-colors duration-150"
+            style={{
+              borderBottomColor: tab === 0 ? 'var(--color-accent)' : 'transparent',
+              color: tab === 0 ? 'var(--color-accent)' : 'var(--color-text-muted)',
+              fontWeight: tab === 0 ? 600 : 400,
+              backgroundColor: 'transparent',
+            }}
+          >
+            Upload file
+          </button>
+          <button
+            type="button"
+            onClick={() => setTab(1)}
+            className="border-b-2 px-4 py-2 text-sm transition-colors duration-150"
+            style={{
+              borderBottomColor: tab === 1 ? 'var(--color-accent)' : 'transparent',
+              color: tab === 1 ? 'var(--color-accent)' : 'var(--color-text-muted)',
+              fontWeight: tab === 1 ? 600 : 400,
+              backgroundColor: 'transparent',
+            }}
+          >
+            Record live
+          </button>
+        </div>
 
         {tab === 0 && (
-          <form onSubmit={handleSubmitUpload}>
-            <Button
-              variant="outlined"
-              component="label"
-              startIcon={<UploadFileIcon />}
-              sx={{ mb: 2 }}
-              fullWidth
+          <form onSubmit={handleSubmitUpload} className="space-y-4">
+            <label
+              className="flex min-h-[120px] cursor-pointer flex-col items-center justify-center rounded border-2 border-dashed py-6 px-4 transition-colors duration-150"
+              style={{ borderColor: 'var(--color-border)' }}
             >
-              {file ? file.name : 'Choose audio file'}
-              <input type="file" hidden accept="audio/*,.wav,.mp3,.m4a,.ogg,.flac" onChange={handleFileChange} />
-            </Button>
-            <Button
+              <UploadIcon />
+              <span className="mt-2 text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                {file ? file.name : 'Choose audio file (WAV, MP3, etc.)'}
+              </span>
+              <input
+                type="file"
+                className="hidden"
+                accept="audio/*,.wav,.mp3,.m4a,.ogg,.flac"
+                onChange={handleFileChange}
+              />
+            </label>
+            <button
               type="submit"
-              variant="contained"
               disabled={loading || !file || (isAnonymous && anonLimitReached)}
-              fullWidth
+              className="w-full py-2.5 text-sm font-medium text-white transition-opacity duration-150 disabled:opacity-50"
+              style={{ backgroundColor: 'var(--color-accent)' }}
             >
-              {loading ? <CircularProgress size={24} /> : 'Transcribe'}
-            </Button>
+              {loading ? 'Transcribing…' : 'Transcribe'}
+            </button>
           </form>
         )}
 
         {tab === 1 && (
-          <Box>
+          <div className="flex flex-col items-center">
             {!recording && !recordedBlob && (
-              <Button
-                variant="contained"
-                startIcon={<MicIcon />}
-                onClick={startRecording}
-                fullWidth
-                sx={{ mb: 2 }}
-                color="primary"
-              >
-                Start recording
-              </Button>
+              <>
+                {isEmpty && (
+                  <div className="mb-8 text-center">
+                    <span
+                      className="text-[100px] leading-none"
+                      style={{ opacity: 0.04, fontFamily: 'var(--font-body)' }}
+                      aria-hidden
+                    >
+                      ஆ
+                    </span>
+                    <p className="mt-2 font-semibold" style={{ color: 'var(--color-text)' }}>
+                      Speech to Text
+                    </p>
+                    <p className="mt-1 text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                      Record or upload audio to get a transcript.
+                    </p>
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={startRecording}
+                  className="flex h-20 w-20 items-center justify-center rounded-full text-white transition-opacity duration-150 hover:opacity-90"
+                  style={{ backgroundColor: 'var(--color-accent)' }}
+                  aria-label="Start recording"
+                >
+                  <MicIcon />
+                </button>
+                <span className="mt-2 text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                  Start recording
+                </span>
+              </>
             )}
             {recording && (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'error.main', animation: 'pulse 1s infinite' }} />
-                  <Typography>Recording {formatTime(recordDuration)}</Typography>
-                </Box>
-                <Button variant="contained" color="error" startIcon={<StopIcon />} onClick={stopRecording}>
+              <div className="flex w-full flex-col items-center gap-4">
+                <button
+                  type="button"
+                  onClick={stopRecording}
+                  className="flex h-20 w-20 items-center justify-center rounded-full border-4 text-white"
+                  style={{
+                    backgroundColor: '#dc2626',
+                    borderColor: 'rgba(220, 38, 38, 0.5)',
+                    animation: 'record-pulse 1.5s ease-in-out infinite',
+                  }}
+                  aria-label="Stop recording"
+                >
+                  <StopIcon />
+                </button>
+                <p className="text-sm" style={{ color: 'var(--color-text)' }}>
+                  Recording {formatTime(recordDuration)}
+                </p>
+                <button
+                  type="button"
+                  onClick={stopRecording}
+                  className="rounded border py-2 px-4 text-sm font-medium"
+                  style={{ borderColor: '#dc2626', color: '#dc2626' }}
+                >
                   Stop
-                </Button>
-              </Box>
+                </button>
+              </div>
             )}
             {recordedBlob && !recording && (
-              <Box sx={{ mb: 2 }}>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+              <div className="w-full space-y-3">
+                <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
                   Recorded audio. Play back or transcribe.
-                </Typography>
-                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                  <audio controls src={URL.createObjectURL(recordedBlob)} style={{ maxWidth: '100%', height: 40 }} />
-                  <Button variant="outlined" size="small" onClick={() => { setRecordedBlob(null); setRecordDuration(0); }}>
+                </p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <audio controls src={URL.createObjectURL(recordedBlob)} className="max-h-10 max-w-full flex-1" />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setRecordedBlob(null);
+                      setRecordDuration(0);
+                    }}
+                    className="rounded border py-1.5 px-3 text-sm"
+                    style={{ borderColor: 'var(--color-border)', color: 'var(--color-text)' }}
+                  >
                     Record again
-                  </Button>
-                  <Button
-                    variant="contained"
-                    startIcon={loading ? <CircularProgress size={20} /> : null}
-                    disabled={loading || (isAnonymous && anonLimitReached)}
+                  </button>
+                  <button
+                    type="button"
                     onClick={handleSubmitRecorded}
+                    disabled={loading || (isAnonymous && anonLimitReached)}
+                    className="rounded py-1.5 px-3 text-sm font-medium text-white transition-opacity duration-150 disabled:opacity-50"
+                    style={{ backgroundColor: 'var(--color-accent)' }}
                   >
                     {loading ? 'Transcribing…' : 'Transcribe'}
-                  </Button>
-                </Box>
-              </Box>
+                  </button>
+                </div>
+              </div>
             )}
-          </Box>
+          </div>
         )}
 
         {result && (
-          <Box sx={{ mt: 3, p: 2, bgcolor: 'grey.100', borderRadius: 1 }}>
-            <Typography variant="subtitle2" color="text.secondary">
-              {result.language_code && `Language: ${result.language_code}`}
-            </Typography>
-            <Typography sx={{ mt: 1, whiteSpace: 'pre-wrap' }}>{result.transcript || '—'}</Typography>
-          </Box>
+          <div
+            className="content-indic mt-6 rounded border p-4"
+            style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-bg)' }}
+          >
+            {result.language_code && (
+              <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                Language: {result.language_code}
+              </p>
+            )}
+            <p className="mt-2 whitespace-pre-wrap" style={{ lineHeight: 1.9 }}>
+              {result.transcript || '—'}
+            </p>
+          </div>
         )}
-      </Paper>
-      <style>{`
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-      `}</style>
-    </Box>
+      </div>
+    </div>
   );
 }

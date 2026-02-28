@@ -14,5 +14,5 @@ export const ROUTES = {
   ADMIN: '/admin',
 };
 
-/** Paths allowed without authentication (anonymous tier). */
-export const ANONYMOUS_PATHS = [ROUTES.DASHBOARD_INDEX, ROUTES.TTS, ROUTES.STT, ROUTES.TRANSLATE, ROUTES.LEARN, ROUTES.DASHBOARD];
+/** Paths allowed without authentication (anonymous tier). Root (/) excluded so non-logged-in users see landing first. */
+export const ANONYMOUS_PATHS = [ROUTES.TTS, ROUTES.STT, ROUTES.TRANSLATE, ROUTES.LEARN, ROUTES.DASHBOARD];

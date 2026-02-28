@@ -1,30 +1,12 @@
-import { Link as RouterLink } from 'react-router-dom';
-import {
-  Box,
-  Grid,
-  Card,
-  CardContent,
-  CardActionArea,
-  Typography,
-  Link,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Alert,
-  Button,
-} from '@mui/material';
-import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver';
-import MicIcon from '@mui/icons-material/Mic';
-import TranslateIcon from '@mui/icons-material/Translate';
+import { Link } from 'react-router-dom';
 import { useLocale } from '../context/LocaleContext';
 import { useUser } from '../context/UserContext';
 import { ROUTES } from '../constants/routes';
 
 const toolKeys = [
-  { key: 'tts', path: '/tts', icon: <RecordVoiceOverIcon sx={{ fontSize: 40 }} /> },
-  { key: 'stt', path: '/stt', icon: <MicIcon sx={{ fontSize: 40 }} /> },
-  { key: 'translate', path: '/translate', icon: <TranslateIcon sx={{ fontSize: 40 }} /> },
+  { key: 'tts', path: ROUTES.TTS },
+  { key: 'stt', path: ROUTES.STT },
+  { key: 'translate', path: ROUTES.TRANSLATE },
 ];
 
 export default function Dashboard() {
@@ -33,73 +15,65 @@ export default function Dashboard() {
   const isAnonymous = !user;
 
   return (
-    <Box sx={{ py: { xs: 2, sm: 3 } }}>
+    <div className="py-6">
       {isAnonymous && (
-        <Alert severity="info" sx={{ mb: 2 }} action={<Button component={RouterLink} to={ROUTES.SIGNUP} size="small" color="inherit">{t('nav.signUp')}</Button>}>
-          {t('dashboard.tryModeInfo')}
-        </Alert>
+        <div
+          className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded border py-2 px-3 text-sm"
+          style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-surface)' }}
+        >
+          <span style={{ color: 'var(--color-text)' }}>{t('dashboard.tryModeInfo')}</span>
+          <Link
+            to={ROUTES.SIGNUP}
+            className="shrink-0 font-medium"
+            style={{ color: 'var(--color-accent)' }}
+          >
+            {t('nav.signUp')}
+          </Link>
+        </div>
       )}
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 1, mb: 2 }}>
-        <Typography color="text.secondary" sx={{ mb: { xs: 2, sm: 3 } }}>
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-2">
+        <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
           {t('dashboard.intro')}{' '}
-          <Link component={RouterLink} to="/learn" underline="hover">
+          <Link to={ROUTES.LEARN} className="underline" style={{ color: 'var(--color-accent)' }}>
             {t('dashboard.learnLink')}
           </Link>
-        </Typography>
-        <FormControl size="small" sx={{ minWidth: 120 }}>
-          <InputLabel id="dashboard-lang-label">Language</InputLabel>
-          <Select
-            labelId="dashboard-lang-label"
-            value={locale}
-            label="Language"
-            onChange={(e) => setLocale(e.target.value)}
-          >
-            {options.map((opt) => (
-              <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Box>
-      <Grid container spacing={{ xs: 2, sm: 3 }}>
+        </p>
+        <select
+          value={locale}
+          onChange={(e) => setLocale(e.target.value)}
+          className="rounded border bg-transparent py-1.5 pl-2 pr-8 text-sm"
+          style={{ borderColor: 'var(--color-border)', color: 'var(--color-text)' }}
+          aria-label="Language"
+        >
+          {options.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
         {toolKeys.map((tool) => (
-          <Grid item xs={12} sm={6} md={4} key={tool.path}>
-            <Card
-              sx={{
-                height: '100%',
-                borderRadius: 2,
-                overflow: 'hidden',
-                transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-                '&:hover': {
-                  transform: 'translateY(-4px)',
-                  boxShadow: 4,
-                },
-              }}
-            >
-              <CardActionArea component={RouterLink} to={tool.path} sx={{ height: '100%', p: { xs: 2, sm: 2.5 }, textAlign: 'left' }}>
-                <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-                  <Box
-                    sx={{
-                      color: 'primary.main',
-                      mb: 1.5,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'flex-start',
-                    }}
-                  >
-                    {tool.icon}
-                  </Box>
-                  <Typography variant="h6" fontWeight={600} gutterBottom>
-                    {t(`dashboard.${tool.key}.title`)}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>
-                    {t(`dashboard.${tool.key}.description`)}
-                  </Typography>
-                </CardContent>
-              </CardActionArea>
-            </Card>
-          </Grid>
+          <Link
+            key={tool.path}
+            to={tool.path}
+            className="block rounded-lg border p-5 text-left transition-[border-color,transform] duration-150 hover:border-[var(--color-accent)] hover:-translate-y-0.5"
+            style={{
+              borderColor: 'var(--color-border)',
+              backgroundColor: 'var(--color-surface)',
+              textDecoration: 'none',
+              color: 'inherit',
+            }}
+          >
+            <p className="mb-2 text-lg font-semibold" style={{ color: 'var(--color-accent)' }}>
+              {t(`dashboard.${tool.key}.title`)}
+            </p>
+            <p className="text-sm" style={{ color: 'var(--color-text-muted)', lineHeight: 1.5 }}>
+              {t(`dashboard.${tool.key}.description`)}
+            </p>
+          </Link>
         ))}
-      </Grid>
-    </Box>
+      </div>
+    </div>
   );
 }

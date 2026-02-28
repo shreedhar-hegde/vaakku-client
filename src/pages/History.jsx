@@ -1,40 +1,8 @@
 import { useState, useEffect } from 'react';
-import {
-  Box,
-  Typography,
-  List,
-  ListItem,
-  ListItemText,
-  Chip,
-  IconButton,
-  CircularProgress,
-  Alert,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Paper,
-  Tooltip,
-} from '@mui/material';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver';
-import MicIcon from '@mui/icons-material/Mic';
-import TranslateIcon from '@mui/icons-material/Translate';
 import { historyApi, ai } from '../api/axios';
 
-const TYPE_LABELS = {
-  tts: 'Text to Speech',
-  stt: 'Speech to Text',
-  translate: 'Translate',
-};
-
-const TYPE_ICONS = {
-  tts: <RecordVoiceOverIcon fontSize="small" />,
-  stt: <MicIcon fontSize="small" />,
-  translate: <TranslateIcon fontSize="small" />,
-};
+const TYPE_LABELS = { tts: 'Text to Speech', stt: 'Speech to Text', translate: 'Translate' };
+const DEFAULT_TTS_LANG = 'en-IN';
 
 function formatDate(d) {
   if (!d) return '';
@@ -51,8 +19,6 @@ function getOutputText(entry) {
   return '';
 }
 
-const DEFAULT_TTS_LANG = 'en-IN';
-
 export default function History() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -66,8 +32,7 @@ export default function History() {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    const params = {};
-    if (typeFilter) params.type = typeFilter;
+    const params = typeFilter ? { type: typeFilter } : {};
     historyApi
       .getList(params)
       .then((res) => setItems(res.data?.items ?? []))
@@ -77,13 +42,12 @@ export default function History() {
 
   const handleCopy = (text) => {
     if (!text) return;
-    navigator.clipboard.writeText(text).then(() => {});
+    navigator.clipboard.writeText(text);
   };
 
   const handlePlay = async (entry) => {
     setPlayError(null);
-    const textToSpeak =
-      entry.type === 'tts' ? (entry.input || '') : entry.type === 'stt' ? (entry.output || '') : '';
+    const textToSpeak = entry.type === 'tts' ? (entry.input || '') : entry.type === 'stt' ? (entry.output || '') : '';
     if (!textToSpeak.trim()) return;
     const lang = entry.type === 'tts' ? (entry.target_language_code || DEFAULT_TTS_LANG) : DEFAULT_TTS_LANG;
     setPlayLoadingId(entry._id);
@@ -98,9 +62,7 @@ export default function History() {
       if (base64) {
         setPlayAudioUrl(`data:audio/wav;base64,${base64}`);
         setPlayingId(entry._id);
-      } else {
-        setPlayError('No audio returned');
-      }
+      } else setPlayError('No audio returned');
     } catch (err) {
       setPlayError(err.response?.data?.error || err.response?.data?.message || err.message || 'Play failed');
     } finally {
@@ -114,128 +76,133 @@ export default function History() {
   };
 
   return (
-    <Box sx={{ py: { xs: 2, sm: 3 } }}>
-      <Typography variant="h5" fontWeight={600} gutterBottom>
+    <div className="py-6">
+      <h1 className="mb-1 text-lg font-semibold" style={{ color: 'var(--color-text)' }}>
         History
-      </Typography>
-      <Typography color="text.secondary" sx={{ mb: 1 }}>
+      </h1>
+      <p className="mb-4 text-sm" style={{ color: 'var(--color-text-muted)' }}>
         Past TTS, STT, and translation results. Copy output to reuse.
-      </Typography>
-      <Alert severity="info" icon={<InfoOutlinedIcon />} sx={{ mb: 2 }}>
+      </p>
+      <div
+        className="mb-4 flex items-center gap-2 rounded border py-2 px-3 text-sm"
+        style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-surface)', color: 'var(--color-text-muted)' }}
+      >
         History is limited to the 10 most recent entries. Older entries are removed automatically.
-      </Alert>
+      </div>
 
-      <FormControl size="small" sx={{ minWidth: 160, mb: 2 }}>
-        <InputLabel>Type</InputLabel>
-        <Select
-          value={typeFilter}
-          label="Type"
-          onChange={(e) => setTypeFilter(e.target.value)}
-        >
-          <MenuItem value="">All</MenuItem>
-          <MenuItem value="tts">Text to Speech</MenuItem>
-          <MenuItem value="stt">Speech to Text</MenuItem>
-          <MenuItem value="translate">Translate</MenuItem>
-        </Select>
-      </FormControl>
+      <select
+        value={typeFilter}
+        onChange={(e) => setTypeFilter(e.target.value)}
+        className="mb-4 rounded border py-1.5 pl-2 pr-8 text-sm"
+        style={{ borderColor: 'var(--color-border)', color: 'var(--color-text)' }}
+        aria-label="Filter by type"
+      >
+        <option value="">All</option>
+        <option value="tts">Text to Speech</option>
+        <option value="stt">Speech to Text</option>
+        <option value="translate">Translate</option>
+      </select>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
+        <div className="mb-4 rounded border py-2 px-3 text-sm" style={{ borderColor: '#dc2626', backgroundColor: '#fef2f2', color: '#b91c1c' }}>
           {error}
-        </Alert>
+        </div>
       )}
       {playError && (
-        <Alert severity="error" sx={{ mb: 2 }} onClose={() => setPlayError(null)}>
-          {playError}
-        </Alert>
+        <div className="mb-4 flex items-center justify-between rounded border py-2 px-3 text-sm" style={{ borderColor: '#dc2626', backgroundColor: '#fef2f2', color: '#b91c1c' }}>
+          <span>{playError}</span>
+          <button type="button" onClick={() => setPlayError(null)} className="underline">Dismiss</button>
+        </div>
       )}
 
       {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-          <CircularProgress />
-        </Box>
+        <div className="py-8 text-center text-sm" style={{ color: 'var(--color-text-muted)' }}>
+          Loading…
+        </div>
       ) : items.length === 0 ? (
-        <Typography color="text.secondary">No history yet. Use TTS, STT, or Translate to see entries here.</Typography>
+        <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+          No history yet. Use TTS, STT, or Translate to see entries here.
+        </p>
       ) : (
-        <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
-          <List disablePadding>
-            {items.map((entry) => {
-              const outputText = getOutputText(entry);
-              const hasCopy = outputText && entry.type !== 'tts';
-              const canPlay =
-                (entry.type === 'tts' && (entry.input || '').trim()) ||
-                (entry.type === 'stt' && (entry.output || '').trim());
-              const isPlaying = playingId === entry._id;
-              const isPlayLoading = playLoadingId === entry._id;
-              return (
-                <ListItem
-                  key={entry._id}
-                  divider
-                  sx={{ flexDirection: 'column', alignItems: 'stretch', py: 1.5 }}
-                >
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-                    <Chip
-                      size="small"
-                      icon={TYPE_ICONS[entry.type]}
-                      label={TYPE_LABELS[entry.type] || entry.type}
-                      color="primary"
-                      variant="outlined"
-                    />
-                    <Typography variant="caption" color="text.secondary">
-                      {formatDate(entry.createdAt)}
-                    </Typography>
-                    {canPlay && (
-                      <Tooltip title={entry.type === 'tts' ? 'Play again' : 'Read aloud'}>
-                        <IconButton
-                          size="small"
-                          color="primary"
-                          onClick={() => handlePlay(entry)}
-                          disabled={!!playLoadingId}
-                          aria-label="Play"
-                        >
-                          {isPlayLoading ? (
-                            <CircularProgress size={20} />
-                          ) : (
-                            <PlayArrowIcon fontSize="small" />
-                          )}
-                        </IconButton>
-                      </Tooltip>
+        <div className="rounded-lg border overflow-hidden" style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-surface)' }}>
+          {items.map((entry) => {
+            const outputText = getOutputText(entry);
+            const hasCopy = outputText && entry.type !== 'tts';
+            const canPlay =
+              (entry.type === 'tts' && (entry.input || '').trim()) ||
+              (entry.type === 'stt' && (entry.output || '').trim());
+            const isPlaying = playingId === entry._id;
+            const isPlayLoading = playLoadingId === entry._id;
+            return (
+              <div
+                key={entry._id}
+                className="border-b p-3 last:border-b-0"
+                style={{ borderColor: 'var(--color-border)' }}
+              >
+                <div className="mb-1 flex items-center gap-2">
+                  <span
+                    className="rounded border px-2 py-0.5 text-xs font-medium"
+                    style={{ borderColor: 'var(--color-accent)', color: 'var(--color-accent)' }}
+                  >
+                    {TYPE_LABELS[entry.type] || entry.type}
+                  </span>
+                  <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                    {formatDate(entry.createdAt)}
+                  </span>
+                  {canPlay && (
+                    <button
+                      type="button"
+                      onClick={() => handlePlay(entry)}
+                      disabled={!!playLoadingId}
+                      className="rounded p-1 transition-opacity hover:opacity-80 disabled:opacity-50"
+                      style={{ color: 'var(--color-accent)' }}
+                      aria-label="Play"
+                      title={entry.type === 'tts' ? 'Play again' : 'Read aloud'}
+                    >
+                      {isPlayLoading ? '…' : '▶'}
+                    </button>
+                  )}
+                </div>
+                {entry.input && (
+                  <p className="mb-1 truncate text-sm" style={{ color: 'var(--color-text-muted)' }} title={entry.input}>
+                    In: {entry.input}
+                  </p>
+                )}
+                {outputText && (
+                  <div className="flex items-start gap-2">
+                    <p className="min-w-0 flex-1 break-words text-sm" style={{ color: 'var(--color-text)' }}>
+                      {outputText}
+                    </p>
+                    {hasCopy && (
+                      <button
+                        type="button"
+                        onClick={() => handleCopy(outputText)}
+                        className="shrink-0 rounded p-1 hover:opacity-80"
+                        style={{ color: 'var(--color-text-muted)' }}
+                        title="Copy"
+                        aria-label="Copy"
+                      >
+                        Copy
+                      </button>
                     )}
-                  </Box>
-                  {entry.input && (
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }} noWrap title={entry.input}>
-                      In: {entry.input}
-                    </Typography>
-                  )}
-                  {outputText && (
-                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
-                      <ListItemText
-                        primary={outputText}
-                        primaryTypographyProps={{ variant: 'body2', sx: { wordBreak: 'break-word' } }}
-                      />
-                      {hasCopy && (
-                        <IconButton size="small" onClick={() => handleCopy(outputText)} title="Copy">
-                          <ContentCopyIcon fontSize="small" />
-                        </IconButton>
-                      )}
-                    </Box>
-                  )}
-                  {isPlaying && playAudioUrl && (
-                    <audio
-                      key={entry._id}
-                      src={playAudioUrl}
-                      controls
-                      autoPlay
-                      onEnded={handlePlayEnded}
-                      style={{ width: '100%', maxWidth: 320, marginTop: 0.5 }}
-                    />
-                  )}
-                </ListItem>
-              );
-            })}
-          </List>
-        </Paper>
+                  </div>
+                )}
+                {isPlaying && playAudioUrl && (
+                  <audio
+                    key={entry._id}
+                    src={playAudioUrl}
+                    controls
+                    autoPlay
+                    onEnded={handlePlayEnded}
+                    className="mt-2 max-w-full"
+                    style={{ maxWidth: 320 }}
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
       )}
-    </Box>
+    </div>
   );
 }

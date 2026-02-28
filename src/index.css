@@ -1,0 +1,102 @@
+/* Design tokens (use in components and Radix) */
+:root {
+  --color-bg: #F8F7F4;
+  --color-surface: #FFFFFF;
+  --color-border: #E8E6E1;
+  --color-text: #1A1A1A;
+  --color-text-muted: #767676;
+  --color-accent: #0F4C81;
+  --color-accent-hover: #0A3D6E;
+  --font-body: 'Noto Sans', 'Noto Sans Devanagari', 'Noto Sans Tamil', sans-serif;
+  --font-display: 'Plus Jakarta Sans', sans-serif;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+}
+
+/* Indian script content: minimum 16px, line-height 1.85 */
+.content-indic {
+  font-family: var(--font-body);
+  line-height: 1.85;
+  font-size: 16px;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base styles */
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  margin: 0;
+  min-height: 100vh;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Record pulse animation (STT) */
+@keyframes record-pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); }
+  50% { opacity: 0.9; box-shadow: 0 0 0 12px rgba(220, 38, 38, 0); }
+}
+
+/* Swap button rotation */
+.swap-rotate {
+  transition: transform 150ms ease;
+}
+.swap-rotate:hover {
+  transform: rotate(180deg);
+}
+
+/* Language select chevron: point up when open */
+.language-select-trigger[data-state="open"] .select-chevron {
+  transform: rotate(180deg);
+}
+.select-chevron {
+  transition: transform 0.2s ease;
+}
+
+/* Radix Tabs trigger: inactive (muted) and active (accent underline) */
+.credits-api-tab {
+  border-bottom-color: transparent;
+  color: var(--color-text-muted);
+}
+.credits-api-tab[data-state="active"] {
+  border-bottom-color: var(--color-accent);
+  color: var(--color-accent);
+  font-weight: 600;
+}
+[data-radix-tabs-trigger][data-state="active"] {
+  border-bottom-color: var(--color-accent);
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+/* TTS: voice row scroll fade overlays at edges */
+.tts-voice-fade {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 28px;
+  pointer-events: none;
+  z-index: 1;
+}
+.tts-voice-fade-left {
+  left: 0;
+  background: linear-gradient(to right, var(--color-surface) 0%, transparent 100%);
+}
+.tts-voice-fade-right {
+  right: 0;
+  background: linear-gradient(to left, var(--color-surface) 0%, transparent 100%);
+}
+
+/* TTS: pace slider — accent thumb, slightly larger track */
+.tts-pace-slider {
+  height: 8px;
+  cursor: pointer;
+}

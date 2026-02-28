@@ -1,6 +1,8 @@
 import { Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { UserProvider } from './context/UserContext';
-import Navbar from './components/Navbar';
+import Topbar from './components/Topbar';
+import Sidebar from './components/Sidebar';
+import MobileNav from './components/MobileNav';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Landing from './pages/Landing';
@@ -40,18 +42,22 @@ function RootRoute() {
 function Layout({ children }) {
   return (
     <UserProvider>
-      <Navbar />
-      <main
-        style={{
-          padding: 'clamp(16px, 4vw, 24px)',
-          maxWidth: 960,
-          margin: '0 auto',
-          minHeight: 'calc(100vh - 56px)',
-          boxSizing: 'border-box',
-        }}
-      >
-        {children}
-      </main>
+      <Topbar />
+      <div className="flex min-h-screen pt-14" style={{ backgroundColor: 'var(--color-bg)' }}>
+        <Sidebar />
+        <main
+          className="flex-1 px-5 pb-24 pt-6 md:px-12 md:pb-12"
+          style={{
+            maxWidth: 1100,
+            margin: '0 auto',
+            width: '100%',
+            boxSizing: 'border-box',
+          }}
+        >
+          {children}
+        </main>
+      </div>
+      <MobileNav />
     </UserProvider>
   );
 }
